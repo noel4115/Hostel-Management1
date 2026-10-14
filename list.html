@@ -1,0 +1,66 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>All Rooms</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header><h1>HOSTEL MANAGEMENT SYSTEM</h1><p>All Room Records</p></header>
+<nav>
+    <a href="index.html">Home</a><a href="insert.html">Add Room</a>
+    <a href="list.html">All Rooms</a><a href="listOne.html">Search Room</a>
+    <a href="update.html">Update Room</a><a href="delete.html">Delete Room</a>
+</nav>
+<main>
+    <h2>Room Details</h2>
+    <button onclick="loadRooms()">Refresh</button>
+    <div class="table-wrap">
+        <table>
+            <thead><tr>
+                <th>Room ID</th><th>Room No</th><th>Block Name</th>
+                <th>Capacity</th><th>No. Occupied</th><th>Status</th>
+            </tr></thead>
+            <tbody id="roomData"></tbody>
+        </table>
+    </div>
+    <p id="message"></p>
+</main>
+<footer>Hostel Management System</footer>
+<script>
+async function loadRooms() {
+    const tbody = document.getElementById("roomData");
+    const msg = document.getElementById("message");
+    tbody.replaceChildren();
+    msg.textContent = "";
+
+    try {
+        const response = await fetch("/api/rooms");
+        const rooms = await response.json();
+        if (!response.ok) throw new Error(rooms.error);
+
+        if (!rooms.length) {
+            msg.textContent = "No rooms found.";
+            return;
+        }
+
+        rooms.forEach(r => {
+            const tr = document.createElement("tr");
+            [r.room_id, r.room_no, r.block_name, r.capacity,
+             r.no_of_occupied, r.status].forEach(value => {
+                const td = document.createElement("td");
+                td.textContent = value;
+                tr.appendChild(td);
+            });
+            tbody.appendChild(tr);
+        });
+    } catch (e) {
+        msg.textContent = "Error: " + e.message;
+    }
+}
+loadRooms();
+</script>
+</body>
+</html>

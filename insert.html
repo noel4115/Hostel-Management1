@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Add Room - Hostel Management</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+    <h1>HOSTEL MANAGEMENT SYSTEM</h1>
+    <p>Add Room Record</p>
+</header>
+<nav>
+    <a href="index.html">Home</a>
+    <a href="insert.html">Add Room</a>
+    <a href="list.html">All Rooms</a>
+    <a href="listOne.html">Search Room</a>
+    <a href="update.html">Update Room</a>
+    <a href="delete.html">Delete Room</a>
+</nav>
+<main>
+    <div class="room-top-banner">
+        <img src="images/hostel-room.jpg" alt="Hostel Room Interior">
+        <div class="room-banner-overlay">
+            <span class="room-banner-tag">Hostel Living</span>
+            <h3>Standard Student Room</h3>
+        </div>
+    </div>
+    <h2>Add New Room</h2>
+    <p>Enter the room details below to register a new hostel room.</p>
+
+    <form id="insertForm">
+        <label for="room_no">Room Number</label>
+        <input type="text" id="room_no" name="room_no" placeholder="e.g. 101 or A-101" required>
+
+        <label for="block_name">Block Name</label>
+        <select id="block_name" name="block_name" required>
+            <option value="" disabled selected>-- Select Block --</option>
+            <option value="A" data-capacity="4">Block A (Capacity: 4)</option>
+            <option value="B" data-capacity="4">Block B (Capacity: 4)</option>
+            <option value="C" data-capacity="3">Block C (Capacity: 3)</option>
+            <option value="D" data-capacity="5">Block D (Capacity: 5)</option>
+        </select>
+
+        <label for="capacity">Capacity (Total Beds)</label>
+        <input type="number" id="capacity" name="capacity" min="1" step="1" placeholder="Select a block or enter capacity" required>
+
+        <label for="no_of_occupied">Number of Occupied Beds</label>
+        <input type="number" id="no_of_occupied" name="no_of_occupied" min="0" step="1" value="0" placeholder="e.g. 0" required>
+
+        <button type="submit">Add Room</button>
+        <button type="reset" class="secondary" id="resetBtn">Reset</button>
+    </form>
+
+    <p id="message" role="status"></p>
+</main>
+<footer>Hostel Management System</footer>
+
+<script>
+const form = document.getElementById("insertForm");
+const roomNoInput = document.getElementById("room_no");
+const blockSelect = document.getElementById("block_name");
+const capacityInput = document.getElementById("capacity");
+const occupiedInput = document.getElementById("no_of_occupied");
+const message = document.getElementById("message");
+
+// Standard capacities mapped to each Block
+const blockCapacities = {
+    "A": 4,
+    "B": 4,
+    "C": 3,
+    "D": 5
+};
+
+// Automatically fill capacity when a Block is selected
+blockSelect.addEventListener("change", () => {
+    const selectedBlock = blockSelect.value;
+    if (blockCapacities[selectedBlock] !== undefined) {
+        capacityInput.value = blockCapacities[selectedBlock];
+        occupiedInput.max = capacityInput.value;
+        if (Number(occupiedInput.value) > Number(capacityInput.value)) {
+            occupiedInput.value = capacityInput.value;
+        }
+    }
+});
+
+// Dynamically limit occupied beds <= capacity
+capacityInput.addEventListener("input", () => {
+    if (capacityInput.value) {
+        occupiedInput.max = capacityInput.value;
+    } else {
+        occupiedInput.removeAttribute("max");
+    }
+});
+
+// Form submission handler
+form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    message.textContent = "";
+    message.style.color = "";
+
+    const roomNo = roomNoInput.value.trim();
+    const blockName = blockSelect.value;
+    const capacity = Number(capacityInput.value);
+    const occupied = Number(occupiedInput.value);
+
+    if (!roomNo || !blockName || !capacity) {
+        message.style.color = "#c0392b";
+        message.textContent = "Please fill in all required fields.";
+        return;
+    }
+
+    if (occupied > capacity) {
+        message.style.color = "#c0392b";
+        message.textContent = "Occupied count cannot exceed room capacity.";
+        return;
+    }
+
+    const payload = {
+        room_no: roomNo,
+        block_name: blockName,
+        capacity: capacity,
+        no_of_occupied: occupied
+    };
+
+    try {
+        const response = await fetch("/api/rooms", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payload)
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || "Failed to add room");
+        }
+
+        message.style.color = "#16a34a";
+        message.textContent = `${data.message} (Room ID: ${data.room_id})`;
+        form.reset();
+        occupiedInput.value = "0";
+        occupiedInput.removeAttribute("max");
+    } catch (err) {
+        message.style.color = "#c0392b";
+        message.textContent = "Error: " + err.message;
+    }
+});
+
+document.getElementById("resetBtn").addEventListener("click", () => {
+    message.textContent = "";
+    message.style.color = "";
+    occupiedInput.removeAttribute("max");
+});
+</script>
+</body>
+</html>

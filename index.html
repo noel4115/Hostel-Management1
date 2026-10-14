@@ -1,0 +1,66 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hostel Management</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+    <h1>HOSTEL MANAGEMENT SYSTEM</h1>
+    <p>Room Details and Vacancy Management</p>
+</header>
+<nav>
+    <a href="index.html">Home</a>
+    <a href="insert.html">Add Room</a>
+    <a href="list.html">All Rooms</a>
+    <a href="listOne.html">Search Room</a>
+    <a href="update.html">Update Room</a>
+    <a href="delete.html">Delete Room</a>
+</nav>
+<main>
+    <h2>Welcome to Hostel Management System</h2>
+    <p>Manage room numbers, blocks, capacity, occupied beds and vacancies.</p>
+
+    <div class="cards">
+        <a class="card" href="insert.html"><h3>Add Room</h3><p>Register a room</p></a>
+        <a class="card" href="list.html"><h3>All Rooms</h3><p>View all records</p></a>
+        <a class="card" href="listOne.html"><h3>Search Room</h3><p>Find room details</p></a>
+        <a class="card" href="update.html"><h3>Update Room</h3><p>Edit a room</p></a>
+        <a class="card" href="delete.html"><h3>Delete Room</h3><p>Remove a record</p></a>
+    </div>
+
+    <h2>Room Summary</h2>
+    <div class="cards">
+        <div class="card"><h3>Total Rooms</h3><p id="total">-</p></div>
+        <div class="card"><h3>Available</h3><p id="available">-</p></div>
+        <div class="card"><h3>Full</h3><p id="full">-</p></div>
+        <div class="card"><h3>Vacant</h3><p id="vacant">-</p></div>
+    </div>
+    <p id="message"></p>
+</main>
+<footer>Hostel Management System</footer>
+<script>
+async function loadSummary() {
+    try {
+        const response = await fetch("/api/rooms");
+        const rooms = await response.json();
+        if (!response.ok) throw new Error(rooms.error);
+
+        document.getElementById("total").textContent = rooms.length;
+        document.getElementById("available").textContent =
+            rooms.filter(r => r.status.toLowerCase() === "available").length;
+        document.getElementById("full").textContent =
+            rooms.filter(r => r.status.toLowerCase() === "full").length;
+        document.getElementById("vacant").textContent =
+            rooms.filter(r => r.status.toLowerCase() === "vacant").length;
+    } catch (e) {
+        document.getElementById("message").textContent = e.message;
+    }
+}
+loadSummary();
+</script>
+</body>
+</html>

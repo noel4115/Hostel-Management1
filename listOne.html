@@ -1,0 +1,89 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Search Room</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header><h1>HOSTEL MANAGEMENT SYSTEM</h1><p>Search Room Details</p></header>
+<nav>
+    <a href="index.html">Home</a><a href="insert.html">Add Room</a>
+    <a href="list.html">All Rooms</a><a href="listOne.html">Search Room</a>
+    <a href="update.html">Update Room</a><a href="delete.html">Delete Room</a>
+</nav>
+<main>
+    <h2>Search Room by ID</h2>
+    <label for="roomSelect">Select Room</label>
+    <select id="roomSelect"><option value="">Loading...</option></select>
+    <button onclick="searchRoom()">Search</button>
+    <div id="result" class="table-wrap"></div>
+    <p id="message"></p>
+</main>
+<footer>Hostel Management System</footer>
+<script>
+const select = document.getElementById("roomSelect");
+
+async function loadOptions() {
+    try {
+        const response = await fetch("/api/rooms");
+        const rooms = await response.json();
+        if (!response.ok) throw new Error(rooms.error);
+
+        select.replaceChildren(new Option("Select Room ID", ""));
+        rooms.forEach(r => select.add(new Option(
+            r.room_id, r.room_id
+        )));
+        if (!rooms.length) {
+            document.getElementById("message").textContent = "No rooms found.";
+        }
+    } catch (e) {
+        document.getElementById("message").textContent = e.message;
+    }
+}
+
+async function searchRoom() {
+    const result = document.getElementById("result");
+    const msg = document.getElementById("message");
+    result.replaceChildren();
+    msg.textContent = "";
+
+    if (!select.value) {
+        msg.textContent = "Please select a room.";
+        return;
+    }
+
+    try {
+        const response = await fetch("/api/rooms/" + encodeURIComponent(select.value));
+        const r = await response.json();
+        if (!response.ok) throw new Error(r.error);
+
+        const table = document.createElement("table");
+        const tbody = document.createElement("tbody");
+
+        [
+            ["Room ID", r.room_id], ["Room No", r.room_no],
+            ["Block Name", r.block_name], ["Capacity", r.capacity],
+            ["No. Occupied", r.no_of_occupied], ["Status", r.status]
+        ].forEach(([label, value]) => {
+            const tr = document.createElement("tr");
+            const th = document.createElement("th");
+            const td = document.createElement("td");
+            th.textContent = label;
+            td.textContent = value;
+            tr.append(th, td);
+            tbody.appendChild(tr);
+        });
+
+        table.appendChild(tbody);
+        result.appendChild(table);
+    } catch (e) {
+        msg.textContent = "Error: " + e.message;
+    }
+}
+loadOptions();
+</script>
+</body>
+</html>

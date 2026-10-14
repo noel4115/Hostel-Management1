@@ -1,0 +1,134 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Update Room</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header><h1>HOSTEL MANAGEMENT SYSTEM</h1><p>Update Room Details</p></header>
+<nav>
+    <a href="index.html">Home</a><a href="insert.html">Add Room</a>
+    <a href="list.html">All Rooms</a><a href="listOne.html">Search Room</a>
+    <a href="update.html">Update Room</a><a href="delete.html">Delete Room</a>
+</nav>
+<main>
+    <h2>Update Room</h2>
+    <label for="roomSelect">Select Room ID</label>
+    <select id="roomSelect"><option value="">Loading...</option></select>
+    <button type="button" id="loadBtn">Load Details</button>
+
+    <form id="updateForm" hidden>
+        <label for="room_no">Room Number</label>
+        <input id="room_no" required>
+
+        <label for="block_name">Block Name</label>
+        <select id="block_name" required>
+            <option value="A">A</option><option value="B">B</option>
+            <option value="C">C</option><option value="D">D</option>
+        </select>
+
+        <label for="capacity">Capacity</label>
+        <input id="capacity" type="number" min="1" step="1" required>
+
+        <label for="no_of_occupied">Number of Occupied Beds</label>
+        <input id="no_of_occupied" type="number" min="0" step="1" required>
+
+        <button type="submit">Update Room</button>
+    </form>
+    <p id="message"></p>
+</main>
+<footer>Hostel Management System</footer>
+<script>
+const select = document.getElementById("roomSelect");
+const form = document.getElementById("updateForm");
+const cap = document.getElementById("capacity");
+const occupied = document.getElementById("no_of_occupied");
+let loadedId = "";
+
+async function loadOptions() {
+    try {
+        const response = await fetch("/api/rooms");
+        const rooms = await response.json();
+        if (!response.ok) throw new Error(rooms.error);
+
+        select.replaceChildren(new Option("Select Room ID", ""));
+        rooms.forEach(r => select.add(new Option(
+            r.room_id, r.room_id
+        )));
+    } catch (e) {
+        document.getElementById("message").textContent = e.message;
+    }
+}
+
+select.addEventListener("change", () => {
+    form.hidden = true;
+    loadedId = "";
+});
+
+cap.addEventListener("input", () => occupied.max = cap.value);
+
+document.getElementById("loadBtn").addEventListener("click", async () => {
+    const msg = document.getElementById("message");
+    msg.textContent = "";
+    if (!select.value) {
+        msg.textContent = "Please select a room ID.";
+        return;
+    }
+
+    try {
+        const response = await fetch("/api/rooms/" + encodeURIComponent(select.value));
+        const r = await response.json();
+        if (!response.ok) throw new Error(r.error);
+
+        document.getElementById("room_no").value = r.room_no;
+        document.getElementById("block_name").value = r.block_name;
+        cap.value = r.capacity;
+        occupied.value = r.no_of_occupied;
+        occupied.max = r.capacity;
+        loadedId = String(r.room_id);
+        form.hidden = false;
+    } catch (e) {
+        msg.textContent = e.message;
+    }
+});
+
+form.addEventListener("submit", async e => {
+    e.preventDefault();
+    const msg = document.getElementById("message");
+
+    if (!loadedId || loadedId !== select.value) {
+        msg.textContent = "Load the selected room details first.";
+        return;
+    }
+
+    const data = {
+        room_no: document.getElementById("room_no").value,
+        block_name: document.getElementById("block_name").value,
+        capacity: Number(cap.value),
+        no_of_occupied: Number(occupied.value)
+    };
+
+    try {
+        const response = await fetch("/api/rooms/" + encodeURIComponent(loadedId), {
+            method: "PUT",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(data)
+        });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error);
+
+        msg.textContent = result.message;
+        form.hidden = true;
+        loadedId = "";
+        await loadOptions();
+    } catch (e) {
+        msg.textContent = "Error: " + e.message;
+    }
+});
+loadOptions();
+</script>
+</body>
+</html>

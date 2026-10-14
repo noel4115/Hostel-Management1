@@ -1,0 +1,71 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Delete Room</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header><h1>HOSTEL MANAGEMENT SYSTEM</h1><p>Delete Room Record</p></header>
+<nav>
+    <a href="index.html">Home</a><a href="insert.html">Add Room</a>
+    <a href="list.html">All Rooms</a><a href="listOne.html">Search Room</a>
+    <a href="update.html">Update Room</a><a href="delete.html">Delete Room</a>
+</nav>
+<main>
+    <h2>Delete Room</h2>
+    <p>Select a room to delete its record from the database.</p>
+    <label for="roomSelect">Select Room ID</label>
+    <select id="roomSelect"><option value="">Loading...</option></select>
+    <button class="danger" id="deleteBtn" type="button">Delete Room</button>
+    <p id="message" role="status"></p>
+</main>
+<footer>Hostel Management System</footer>
+<script>
+const select = document.getElementById("roomSelect");
+const msg = document.getElementById("message");
+
+async function loadOptions() {
+    try {
+        const response = await fetch("/api/rooms");
+        const rooms = await response.json();
+        if (!response.ok) throw new Error(rooms.error);
+
+        select.replaceChildren(new Option("Select Room ID", ""));
+        rooms.forEach(r => select.add(new Option(
+            r.room_id, r.room_id
+        )));
+        if (!rooms.length) msg.textContent = "No rooms available.";
+    } catch (e) {
+        msg.textContent = "Error: " + e.message;
+    }
+}
+
+document.getElementById("deleteBtn").addEventListener("click", async () => {
+    if (!select.value) {
+        msg.textContent = "Please select a room.";
+        return;
+    }
+
+    const label = select.options[select.selectedIndex].text;
+    if (!confirm("Do you want to delete " + label + "?")) return;
+
+    try {
+        const response = await fetch("/api/rooms/" + encodeURIComponent(select.value), {
+            method: "DELETE"
+        });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error);
+
+        msg.textContent = result.message;
+        await loadOptions();
+    } catch (e) {
+        msg.textContent = "Error: " + e.message;
+    }
+});
+loadOptions();
+</script>
+</body>
+</html>

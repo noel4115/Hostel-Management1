@@ -1,0 +1,235 @@
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(rgba(16, 42, 72, 0.45), rgba(16, 42, 72, 0.65)), url('images/hostel-bg.jpg') no-repeat center center fixed;
+    background-size: cover;
+    color: #263248;
+    min-height: 100vh;
+}
+
+header {
+    background: rgba(24, 59, 101, 0.92);
+    color: white;
+    padding: 22px;
+    text-align: center;
+    backdrop-filter: blur(6px);
+}
+
+header h1 {
+    margin: 0 0 8px;
+}
+
+nav {
+    background: rgba(16, 42, 72, 0.95);
+    padding: 12px;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    backdrop-filter: blur(6px);
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+    padding: 10px 13px;
+    border-radius: 5px;
+}
+
+nav a:hover {
+    background: #315b88;
+}
+
+main {
+    max-width: 1000px;
+    margin: 30px auto;
+    padding: 25px;
+    background: rgba(255, 255, 255, 0.96);
+    border-radius: 10px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(10px);
+}
+
+h2 {
+    color: #183b65;
+}
+
+label {
+    display: block;
+    margin: 16px 0 7px;
+    font-weight: bold;
+}
+
+input, select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 5px;
+    background: white;
+    font-size: 15px;
+}
+
+input:focus, select:focus {
+    outline: 2px solid #85b7f5;
+}
+
+button {
+    background: #205da5;
+    color: white;
+    padding: 11px 18px;
+    border: none;
+    border-radius: 5px;
+    margin: 15px 5px 5px 0;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+button:hover {
+    background: #123e76;
+}
+
+button.danger {
+    background: #c0392b;
+}
+
+button.secondary {
+    background: #64748b;
+}
+
+.cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 16px;
+    margin: 20px 0;
+}
+
+.card {
+    display: block;
+    text-decoration: none;
+    color: #263248;
+    text-align: center;
+    padding: 20px;
+    border: 1px solid #dbe3ee;
+    border-radius: 8px;
+    background: #f8fafc;
+}
+
+.card:hover {
+    background: #e8f1fc;
+    transform: translateY(-2px);
+}
+
+.table-wrap {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th, td {
+    border: 1px solid #dbe3ee;
+    padding: 12px;
+    text-align: left;
+}
+
+th {
+    background: #183b65;
+    color: white;
+}
+
+tr:nth-child(even) {
+    background: #f2f5fa;
+}
+
+#message {
+    margin-top: 18px;
+    font-weight: bold;
+    overflow-wrap: anywhere;
+}
+
+footer {
+    padding: 20px;
+    text-align: center;
+    color: #ffffff;
+    font-weight: 500;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+}
+
+[hidden] {
+    display: none !important;
+}
+
+/* Room Banner for Add Room page */
+.room-top-banner {
+    position: relative;
+    width: 100%;
+    height: 240px;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+}
+
+.room-top-banner img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.3s ease;
+}
+
+.room-top-banner:hover img {
+    transform: scale(1.02);
+}
+
+.room-banner-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 16px 20px;
+    background: linear-gradient(transparent, rgba(16, 42, 72, 0.85));
+    color: white;
+}
+
+.room-banner-tag {
+    display: inline-block;
+    background: #205da5;
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 3px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+}
+
+.room-banner-overlay h3 {
+    margin: 4px 0 0;
+    font-size: 18px;
+    color: #ffffff;
+}
+
+@media (max-width: 600px) {
+    main {
+        margin: 15px;
+        padding: 16px;
+    }
+
+    nav a {
+        padding: 8px;
+    }
+
+    .room-top-banner {
+        height: 160px;
+    }
+}
